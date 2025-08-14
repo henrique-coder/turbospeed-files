@@ -17,7 +17,7 @@ class TurboSpeedGenerator:
         self.config_file: str = "file-sizes.yaml"
         self.output_dir: Path = Path("./generated")
         self.redirects_dir: Path = Path("./docs/_redirects")
-        self.min_file_size_bytes: int = parse_size("100kb")
+        self.min_file_size_bytes: int = parse_size("1kb")
         self.max_file_size_bytes: int = parse_size("2gb")
         self.max_files_per_release: int = 1000
 
