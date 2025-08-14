@@ -1,4 +1,4 @@
-# Supported formats: {number}mb, {number}gb (float supported)
+# Supported formats: {number}kb, {number}mb, {number}gb (float supported)
 # Minimum: 1KB - Maximum: 2GB (GitHub Free limit) - Maximum files per release: 1000
 
 project_name: "turbospeed"
