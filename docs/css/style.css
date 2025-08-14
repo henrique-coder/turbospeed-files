@@ -1,0 +1,235 @@
+:root {
+  --primary-color: #007acc;
+  --secondary-color: #f8f9fa;
+  --text-color: #333;
+  --border-color: #dee2e6;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+header h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.usage-section,
+.files-section,
+.info-section {
+  margin: 2rem 0;
+}
+
+.usage-section h2,
+.files-section h2,
+.info-section h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.url-examples {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.url-example {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--secondary-color);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.url-example code {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-family: "Monaco", "Consolas", monospace;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.arrow {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.file-info {
+  color: #666;
+  font-weight: 500;
+}
+
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.file-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.file-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.1);
+}
+
+.file-size {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.file-url {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.file-url input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: "Monaco", "Consolas", monospace;
+  font-size: 0.85rem;
+  background: #f8f9fa;
+}
+
+.file-url button,
+.file-url .download-btn {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.file-url button:hover,
+.file-url .download-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.info-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.info-section li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.info-section li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: var(--danger-color);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--danger-color);
+}
+
+footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+#loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .url-example {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .arrow {
+    transform: rotate(90deg);
+  }
+
+  .files-grid {
+    grid-template-columns: 1fr;
+  }
+}
