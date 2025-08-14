@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: |
-          pip install humanfriendly requests pyyaml
+          pip install --upgrade humanfriendly requests pyyaml
 
       - name: Validate configuration
         if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
@@ -86,14 +86,6 @@ jobs:
             ### 📦 Available Files
 
             ${{ steps.generate-table.outputs.release_table }}
-
-            ### 🔐 File Integrity
-
-            Download `checksums.txt` to verify file integrity using MD5 hashes.
-
-            ```
-            md5sum -c checksums.txt
-            ```
 
             ### ⚠️ Important Notes
 
