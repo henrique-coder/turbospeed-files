@@ -292,7 +292,7 @@ class TurboSpeedGenerator:
                 if file_path.exists():
                     size_human = format_size(file_info["bytes"])
                     md5_hash = self.calculate_md5(file_path)
-                    download_url = f"https://github.com/{repo_name}/releases/download/{release_tag}/{filename}"
+                    download_url = f"https://henrique-coder.github.io/turbospeed-files/{filename.split('.')[0]}"
 
                     row = f"| `{filename}` | **{size_human}** | `{md5_hash}` | [📥 Download]({download_url}) |"
                     table_rows.append(row)
