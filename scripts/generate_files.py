@@ -14,7 +14,7 @@ from pathlib import Path
 
 class TurboSpeedGenerator:
     def __init__(self):
-        self.config_file = 'file-sizes.yml'
+        self.config_file = 'file-sizes.yaml'
         self.output_dir = Path('./generated')
         self.max_file_size_gb = 2  # GitHub Free limit
         self.max_files_per_release = 1000  # GitHub limit
