@@ -18,7 +18,7 @@
     <div class="container">
       <header>
         <h1>🚀 TurboSpeed Files</h1>
-        <p>Fast download links for test files</p>
+        <p>Ultra-fast download links for test files</p>
       </header>
 
       <main>
@@ -33,40 +33,56 @@
               >
             </div>
             <p class="format-description">
-              Replace <strong>{SIZE}</strong> with the desired file size (e.g.,
-              1mb, 100kb, 2gb)
+              Replace <strong>{SIZE}</strong> with any file size and it will
+              redirect automatically
             </p>
+          </div>
+
+          <div class="examples">
+            <h3>Example URLs</h3>
+            <div class="example-links">
+              <div class="example-item">
+                <code>/100kb</code>
+                <span>→</span>
+                <span>turbospeed-file-100kb.bin</span>
+              </div>
+              <div class="example-item">
+                <code>/1mb</code>
+                <span>→</span>
+                <span>turbospeed-file-1mb.bin</span>
+              </div>
+              <div class="example-item">
+                <code>/2gb</code>
+                <span>→</span>
+                <span>turbospeed-file-2gb.bin</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="info-section">
-          <h2>Available Files</h2>
-          <p>
-            For current available file sizes, check the
-            <a
-              href="https://github.com/henrique-coder/turbospeed-files"
-              target="_blank"
-            >
-              GitHub repository
-            </a>
-            or view the latest
-            <a
-              href="https://github.com/henrique-coder/turbospeed-files/releases"
-              target="_blank"
-            >
-              release </a
-            >.
-          </p>
-
-          <h3>How it Works</h3>
+          <h2>How It Works</h2>
           <ul>
+            <li>
+              Any size URL automatically redirects to the corresponding GitHub
+              release file
+            </li>
+            <li>No validation - direct redirect for maximum speed</li>
             <li>All files are empty (zero-filled) for testing purposes</li>
             <li>Perfect for bandwidth and storage testing</li>
-            <li>
-              Files are validated against current repository configuration
-            </li>
-            <li>Invalid sizes return a 404 error</li>
           </ul>
+
+          <div class="note">
+            <p>
+              <strong>Note:</strong> Check available file sizes at the
+              <a
+                href="https://github.com/henrique-coder/turbospeed-files/releases"
+                target="_blank"
+              >
+                GitHub releases page
+              </a>
+            </p>
+          </div>
         </div>
       </main>
 

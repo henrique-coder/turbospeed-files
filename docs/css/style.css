@@ -4,7 +4,6 @@
   --text-color: #333;
   --border-color: #dee2e6;
   --success-color: #28a745;
-  --danger-color: #dc3545;
 }
 
 * {
@@ -58,7 +57,7 @@ header p {
 
 .usage-section h2,
 .info-section h2,
-.info-section h3 {
+.examples h3 {
   color: var(--primary-color);
   margin-bottom: 1rem;
 }
@@ -69,10 +68,6 @@ header p {
   border-radius: 8px;
   border-left: 4px solid var(--primary-color);
   margin: 1.5rem 0;
-}
-
-.format-example {
-  margin-bottom: 1rem;
 }
 
 .format-example code {
@@ -88,11 +83,58 @@ header p {
 .format-description {
   color: #666;
   font-size: 0.95rem;
+  margin-top: 1rem;
+}
+
+.examples {
+  margin: 2rem 0;
+}
+
+.example-links {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.example-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+}
+
+.example-item:last-child {
+  border-bottom: none;
+}
+
+.example-item code {
+  background: var(--secondary-color);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-family: "Monaco", "Consolas", monospace;
+  font-weight: bold;
+  color: var(--primary-color);
+  min-width: 80px;
+}
+
+.example-item span:nth-child(2) {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.example-item span:last-child {
+  color: #666;
+  font-family: "Monaco", "Consolas", monospace;
+  font-size: 0.9rem;
 }
 
 .info-section ul {
   list-style: none;
   padding-left: 0;
+  margin-bottom: 2rem;
 }
 
 .info-section li {
@@ -102,119 +144,27 @@ header p {
 }
 
 .info-section li:before {
-  content: "✓";
+  content: "⚡";
   position: absolute;
   left: 0;
-  color: var(--success-color);
-  font-weight: bold;
-}
-
-.info-section a {
-  color: var(--primary-color);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.info-section a:hover {
-  text-decoration: underline;
-}
-
-.error-container {
-  text-align: center;
-  padding: 2rem 0;
-}
-
-.error-container h1 {
-  font-size: 2.5rem;
-  color: var(--primary-color);
-  margin-bottom: 2rem;
-}
-
-.error-message {
-  background: #f8d7da;
-  color: var(--danger-color);
-  padding: 2rem;
-  border-radius: 8px;
-  border-left: 4px solid var(--danger-color);
-  margin: 2rem 0;
-}
-
-.error-message h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.help-section {
-  text-align: left;
-  margin: 2rem 0;
-}
-
-.help-section h3,
-.help-section h4 {
-  color: var(--primary-color);
-  margin-bottom: 1rem;
-}
-
-.links {
-  display: flex;
-  gap: 1rem;
-  margin: 1.5rem 0;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.github-link {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: var(--primary-color);
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.github-link:hover {
-  background: #005a9e;
-  transform: translateY(-2px);
-}
-
-.format-info {
-  background: var(--secondary-color);
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin: 1.5rem 0;
-  text-align: center;
-}
-
-.format-info code {
-  background: white;
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-  font-family: "Monaco", "Consolas", monospace;
-  font-size: 0.9rem;
-  display: block;
-  margin: 1rem 0;
-  word-break: break-all;
-}
-
-.format-info p {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.back-home {
-  margin-top: 2rem;
-}
-
-.back-home a {
-  color: var(--primary-color);
-  text-decoration: none;
-  font-weight: 500;
   font-size: 1.1rem;
 }
 
-.back-home a:hover {
+.note {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.note a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.note a:hover {
   text-decoration: underline;
 }
 
@@ -229,6 +179,7 @@ footer a {
   color: var(--primary-color);
   text-decoration: none;
   font-weight: 500;
+  font-size: 1.1rem;
 }
 
 footer a:hover {
@@ -241,12 +192,18 @@ footer a:hover {
     padding: 1rem;
   }
 
-  .links {
+  .example-item {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .example-item span:nth-child(2) {
+    transform: rotate(90deg);
+    align-self: center;
   }
 
   .format-example code {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 }
