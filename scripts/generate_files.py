@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import hashlib
 import os
@@ -6,6 +8,7 @@ import sys
 from typing import Any
 
 from humanfriendly import format_size, parse_size
+import requests
 import yaml
 
 
@@ -13,24 +16,94 @@ class TurboSpeedGenerator:
     def __init__(self) -> None:
         self.config_file: str = "file-sizes.yaml"
         self.output_dir: Path = Path("./generated")
-        self.max_file_size_bytes: int = 2 * 1024 * 1024 * 1024
+        self.min_file_size_bytes: int = parse_size("1kb")
+        self.max_file_size_bytes: int = parse_size("2gb")
         self.max_files_per_release: int = 1000
 
-    def parse_and_validate_size(self, size_str: str) -> tuple[int, str]:
-        normalized_size = size_str.lower().strip()
+    def normalize_size_string(self, size_str: str) -> str:
+        size_bytes = parse_size(size_str)
 
+        if size_bytes >= parse_size("1gb"):
+            gb_value = size_bytes / parse_size("1gb")
+            if gb_value == int(gb_value):
+                return f"{int(gb_value)}gb"
+            else:
+                return f"{gb_value:.1f}gb".rstrip("0").rstrip(".")
+        elif size_bytes >= parse_size("1mb"):
+            mb_value = size_bytes / parse_size("1mb")
+            if mb_value == int(mb_value):
+                return f"{int(mb_value)}mb"
+            else:
+                return f"{mb_value:.1f}mb".rstrip("0").rstrip(".")
+        else:
+            kb_value = size_bytes / parse_size("1kb")
+            if kb_value == int(kb_value):
+                return f"{int(kb_value)}kb"
+            else:
+                return f"{kb_value:.1f}kb".rstrip("0").rstrip(".")
+
+    def get_preferred_format(self, size_bytes: int) -> str:
+        if size_bytes >= parse_size("1gb"):
+            return "gb"
+        elif size_bytes >= parse_size("1mb"):
+            return "mb"
+        else:
+            return "kb"
+
+    def parse_and_validate_size(self, size_str: str) -> tuple[int, str]:
         try:
-            size_bytes = parse_size(normalized_size)
+            size_bytes = parse_size(size_str.lower().strip())
         except ValueError as e:
             raise ValueError(f"Invalid size format '{size_str}': {e}") from e
+
+        if size_bytes < self.min_file_size_bytes:
+            raise ValueError(f"File size {size_str} is below minimum 100KB")
 
         if size_bytes > self.max_file_size_bytes:
             raise ValueError(f"File size {size_str} exceeds 2GB limit")
 
-        if size_bytes < parse_size("0.1MB"):
-            raise ValueError(f"File size {size_str} is below minimum 0.1MB")
+        normalized = self.normalize_size_string(size_str)
+        preferred_format = self.get_preferred_format(size_bytes)
 
-        return size_bytes, normalized_size
+        current_format = "gb" if "gb" in normalized else ("mb" if "mb" in normalized else "kb")
+
+        if current_format != preferred_format:
+            if preferred_format == "kb":
+                suggested = f"{int(size_bytes / parse_size('1kb'))}kb"
+            elif preferred_format == "mb":
+                suggested = f"{int(size_bytes / parse_size('1mb'))}mb"
+            else:
+                suggested = f"{size_bytes / parse_size('1gb'):.1f}gb".rstrip("0").rstrip(".")
+
+            raise ValueError(f"Size {size_str} should use preferred format: {suggested}")
+
+        return size_bytes, normalized
+
+    def check_for_duplicates(self, sizes: list[str]) -> None:
+        seen_bytes: set[int] = set()
+        size_map: dict[int, list[str]] = {}
+
+        for size_str in sizes:
+            try:
+                size_bytes = parse_size(size_str)
+                if size_bytes in seen_bytes:
+                    if size_bytes not in size_map:
+                        size_map[size_bytes] = []
+                    size_map[size_bytes].append(size_str)
+                else:
+                    seen_bytes.add(size_bytes)
+                    size_map[size_bytes] = [size_str]
+            except ValueError:
+                continue
+
+        duplicates = {k: v for k, v in size_map.items() if len(v) > 1}
+
+        if duplicates:
+            error_msg = "Duplicate sizes found:\n"
+            for size_bytes, size_strs in duplicates.items():
+                preferred = self.normalize_size_string(size_strs[0])
+                error_msg += f"  - {', '.join(size_strs)} (all equal {format_size(size_bytes)}) - use: {preferred}\n"
+            raise ValueError(error_msg.strip())
 
     def calculate_md5(self, file_path: Path) -> str:
         hash_md5 = hashlib.md5()
@@ -57,17 +130,13 @@ class TurboSpeedGenerator:
         if len(config["files"]) > self.max_files_per_release:
             raise ValueError(f"Too many files: {len(config['files'])} > {self.max_files_per_release}")
 
+        self.check_for_duplicates(config["files"])
+
         total_size_bytes = 0
         validated_files = []
-        seen_sizes = set()
 
         for size_str in config["files"]:
             size_bytes, normalized_size = self.parse_and_validate_size(size_str)
-
-            if normalized_size in seen_sizes:
-                raise ValueError(f"Duplicate size found: {size_str}")
-
-            seen_sizes.add(normalized_size)
             total_size_bytes += size_bytes
 
             validated_files.append({
@@ -83,6 +152,68 @@ class TurboSpeedGenerator:
         print(f"   - Total size: {format_size(total_size_bytes)}")
 
         return config, validated_files
+
+    def get_release_assets(self) -> list[str]:
+        token = os.environ.get("GITHUB_TOKEN")
+        repo = os.environ.get("GITHUB_REPOSITORY")
+        tag = os.environ.get("RELEASE_TAG", "turbospeed-files")
+
+        if not token or not repo:
+            return []
+
+        url = f"https://api.github.com/repos/{repo}/releases/tags/{tag}"
+        headers = {"Authorization": f"token {token}"}
+
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                release_data = response.json()
+                return [asset["name"] for asset in release_data.get("assets", [])]
+        except Exception as e:
+            print(f"Warning: Could not fetch release assets: {e}")
+
+        return []
+
+    def delete_release_asset(self, asset_name: str) -> bool:
+        token = os.environ.get("GITHUB_TOKEN")
+        repo = os.environ.get("GITHUB_REPOSITORY")
+        tag = os.environ.get("RELEASE_TAG", "turbospeed-files")
+
+        if not token or not repo:
+            return False
+
+        url = f"https://api.github.com/repos/{repo}/releases/tags/{tag}"
+        headers = {"Authorization": f"token {token}"}
+
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                release_data = response.json()
+                for asset in release_data.get("assets", []):
+                    if asset["name"] == asset_name:
+                        delete_url = asset["url"]
+                        delete_response = requests.delete(delete_url, headers=headers)
+                        return delete_response.status_code == 204
+        except Exception as e:
+            print(f"Warning: Could not delete asset {asset_name}: {e}")
+
+        return False
+
+    def clean_release_assets(self) -> None:
+        try:
+            config, validated_files = self.validate_config()
+            valid_filenames = {f["filename"] for f in validated_files}
+            valid_filenames.add("checksums.txt")
+
+            current_assets = self.get_release_assets()
+
+            for asset_name in current_assets:
+                if asset_name not in valid_filenames:
+                    print(f"🗑️  Removing outdated asset: {asset_name}")
+                    self.delete_release_asset(asset_name)
+
+        except Exception as e:
+            print(f"Warning: Could not clean release assets: {e}")
 
     def create_file_optimized(self, file_path: Path, size_bytes: int) -> None:
         chunk_size = min(1024 * 1024, size_bytes)
@@ -100,8 +231,6 @@ class TurboSpeedGenerator:
 
         self.output_dir.mkdir(exist_ok=True)
 
-        existing_files = {f.name for f in self.output_dir.glob("*.bin")}
-
         print(f"🚀 Generating {len(validated_files)} files...")
 
         for file_info in validated_files:
@@ -109,14 +238,36 @@ class TurboSpeedGenerator:
             size_bytes = file_info["bytes"]
             file_path = self.output_dir / filename
 
-            if filename in existing_files and file_path.stat().st_size == size_bytes:
-                print(f"   Skipping {filename} (already exists)")
+            if file_path.exists() and file_path.stat().st_size == size_bytes:
+                print(f"   Skipping {filename} (already exists with correct size)")
                 continue
 
             print(f"   Creating {filename} ({format_size(size_bytes)})...")
             self.create_file_optimized(file_path, size_bytes)
 
         print(f"✅ Generated {len(validated_files)} files successfully!")
+
+    def generate_checksums(self) -> None:
+        config, validated_files = self.validate_config()
+
+        if not self.output_dir.exists():
+            raise FileNotFoundError("Generated files directory not found")
+
+        checksums_path = self.output_dir / "checksums.txt"
+
+        print("🔐 Generating checksums...")
+
+        with open(checksums_path, "w") as f:
+            for file_info in validated_files:
+                filename = file_info["filename"]
+                file_path = self.output_dir / filename
+
+                if file_path.exists():
+                    md5_hash = self.calculate_md5(file_path)
+                    f.write(f"{md5_hash}  {filename}\n")
+                    print(f"   {filename}: {md5_hash}")
+
+        print(f"✅ Checksums saved to {checksums_path}")
 
     def generate_release_table(self) -> str:
         try:
@@ -137,7 +288,7 @@ class TurboSpeedGenerator:
 
                 if file_path.exists():
                     size_human = format_size(file_info["bytes"])
-                    md5_hash = self.calculate_md5(file_path)[:8] + "..."
+                    md5_hash = self.calculate_md5(file_path)
                     download_url = f"https://github.com/{repo_name}/releases/download/{release_tag}/{filename}"
 
                     row = f"| `{filename}` | **{size_human}** | `{md5_hash}` | [📥 Download]({download_url}) |"
@@ -147,7 +298,7 @@ class TurboSpeedGenerator:
                 return "No files available for download."
 
             total_size = sum(f["bytes"] for f in validated_files)
-            footer = f"\n**Total Collection Size:** {format_size(total_size)} • **Files:** {len(table_rows)}"
+            footer = f"\n\n**Total Collection Size:** {format_size(total_size)} • **Files:** {len(table_rows)}\n\n**Checksums:** [📋 checksums.txt](https://github.com/{repo_name}/releases/download/{release_tag}/checksums.txt)"
 
             return table_header + "\n".join(table_rows) + footer
 
@@ -169,6 +320,8 @@ def main() -> None:
     parser.add_argument("--generate", action="store_true", help="Generate files")
     parser.add_argument("--calculate-total", action="store_true", help="Calculate total size")
     parser.add_argument("--generate-table", action="store_true", help="Generate release table")
+    parser.add_argument("--generate-checksums", action="store_true", help="Generate checksums file")
+    parser.add_argument("--clean-release", action="store_true", help="Clean outdated release assets")
 
     args = parser.parse_args()
     generator = TurboSpeedGenerator()
@@ -182,6 +335,10 @@ def main() -> None:
             print(generator.calculate_total_size())
         elif args.generate_table:
             print(generator.generate_release_table())
+        elif args.generate_checksums:
+            generator.generate_checksums()
+        elif args.clean_release:
+            generator.clean_release_assets()
         else:
             parser.print_help()
 
