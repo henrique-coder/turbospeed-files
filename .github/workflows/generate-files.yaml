@@ -39,10 +39,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate missing files
+      - name: Generate ONLY missing files
         run: python scripts/generate_files.py --generate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate checksums
+      - name: Generate Jekyll redirect pages
+        run: python scripts/generate_files.py --generate-jekyll-redirects
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate checksums for new files
         run: python scripts/generate_files.py --generate-checksums
 
       - name: Generate release table
@@ -52,8 +59,18 @@ jobs:
           echo "release_table<<EOF" >> $GITHUB_OUTPUT
           echo "$TABLE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create or update release
+      - name: Commit Jekyll redirects to repository
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/_redirects/
+          git diff --staged --quiet || git commit -m "Update Jekyll redirects"
+          git push
+
+      - name: Upload ONLY new files to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
@@ -62,6 +79,7 @@ jobs:
             ## 🚀 TurboSpeed Files Collection
 
             Pre-generated empty binary files of various sizes for testing, benchmarking, and development purposes.
+
 
             ### 📦 Available Files
 
@@ -72,9 +90,8 @@ jobs:
             - All files are empty (zero-filled) and created for size testing only
             - Files are optimized for fast download and minimal storage impact
             - Perfect for bandwidth testing, storage testing, and development workflows
-          files: |
-            ./generated/*.bin
-            ./generated/checksums.txt
+            - Real HTTP redirects work with curl, wget, browsers, and all download tools
+          files: ./generated/*
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import hashlib
 import os
@@ -14,7 +16,8 @@ class TurboSpeedGenerator:
     def __init__(self) -> None:
         self.config_file: str = "file-sizes.yaml"
         self.output_dir: Path = Path("./generated")
-        self.min_file_size_bytes: int = parse_size("1kb")
+        self.redirects_dir: Path = Path("./docs/_redirects")
+        self.min_file_size_bytes: int = parse_size("100kb")
         self.max_file_size_bytes: int = parse_size("2gb")
         self.max_files_per_release: int = 1000
 
@@ -177,6 +180,30 @@ class TurboSpeedGenerator:
 
         return []
 
+    def get_release_asset_info(self) -> dict[str, dict[str, Any]]:
+        token = os.environ.get("GITHUB_TOKEN")
+        repo = os.environ.get("GITHUB_REPOSITORY")
+        tag = os.environ.get("RELEASE_TAG", "turbospeed-files")
+
+        if not token or not repo:
+            return {}
+
+        url = f"https://api.github.com/repos/{repo}/releases/tags/{tag}"
+        headers = {"Authorization": f"token {token}"}
+
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                release_data = response.json()
+                asset_info = {}
+                for asset in release_data.get("assets", []):
+                    asset_info[asset["name"]] = {"size": asset["size"], "url": asset["browser_download_url"]}
+                return asset_info
+        except Exception as e:
+            print(f"Warning: Could not fetch release asset info: {e}")
+
+        return {}
+
     def delete_release_asset(self, asset_name: str) -> bool:
         token = os.environ.get("GITHUB_TOKEN")
         repo = os.environ.get("GITHUB_REPOSITORY")
@@ -221,20 +248,27 @@ class TurboSpeedGenerator:
     def check_missing_files(self) -> list[dict[str, Any]]:
         try:
             config, validated_files = self.validate_config_silent()
-            current_assets = self.get_release_assets()
+            release_assets = self.get_release_asset_info()
 
             missing_files = []
 
             for file_info in validated_files:
                 filename = file_info["filename"]
-                if filename not in current_assets:
+                expected_size = file_info["bytes"]
+
+                if filename not in release_assets:
                     missing_files.append(file_info)
-                    print(f"🔍 Missing file detected: {filename}")
+                    print(f"🔍 Missing file: {filename}")
+                elif release_assets[filename]["size"] != expected_size:
+                    missing_files.append(file_info)
+                    print(
+                        f"🔍 Size mismatch: {filename} (expected: {format_size(expected_size)}, got: {format_size(release_assets[filename]['size'])})"
+                    )
 
             if not missing_files:
-                print("✅ All required files exist in release")
+                print("✅ All required files exist in release with correct sizes")
             else:
-                print(f"⚠️  Found {len(missing_files)} missing files")
+                print(f"⚠️  Found {len(missing_files)} files that need to be updated")
 
             return missing_files
 
@@ -250,17 +284,7 @@ class TurboSpeedGenerator:
         missing_files = self.check_missing_files()
 
         if missing_files:
-            print(f"🚀 Recreating {len(missing_files)} missing files...")
-
-            self.output_dir.mkdir(exist_ok=True)
-
-            for file_info in missing_files:
-                filename = file_info["filename"]
-                size_bytes = file_info["bytes"]
-                file_path = self.output_dir / filename
-
-                print(f"   Recreating {filename} ({format_size(size_bytes)})...")
-                self.create_file_optimized(file_path, size_bytes)
+            print(f"📋 {len(missing_files)} files need to be generated")
 
         print("✅ Release sync completed")
 
@@ -278,23 +302,23 @@ class TurboSpeedGenerator:
     def generate_files(self) -> None:
         config, validated_files = self.validate_config_silent()
 
-        self.output_dir.mkdir(exist_ok=True)
-
+        release_assets = self.get_release_asset_info()
         files_to_generate = []
 
         for file_info in validated_files:
             filename = file_info["filename"]
-            size_bytes = file_info["bytes"]
-            file_path = self.output_dir / filename
+            expected_size = file_info["bytes"]
 
-            if not file_path.exists() or file_path.stat().st_size != size_bytes:
+            if filename not in release_assets or release_assets[filename]["size"] != expected_size:
                 files_to_generate.append(file_info)
 
         if not files_to_generate:
-            print("✅ All files already exist with correct sizes")
+            print("✅ All files exist in release with correct sizes - nothing to generate")
             return
 
-        print(f"🚀 Generating {len(files_to_generate)} files...")
+        print(f"🚀 Generating {len(files_to_generate)} missing/incorrect files...")
+
+        self.output_dir.mkdir(exist_ok=True)
 
         for file_info in files_to_generate:
             filename = file_info["filename"]
@@ -310,55 +334,85 @@ class TurboSpeedGenerator:
         config, validated_files = self.validate_config_silent()
 
         if not self.output_dir.exists():
-            raise FileNotFoundError("Generated files directory not found")
+            print("⚠️  No local files found - skipping checksums generation")
+            return
 
         checksums_path = self.output_dir / "checksums.txt"
+        local_files = list(self.output_dir.glob("*.bin"))
 
-        print("🔐 Generating checksums...")
+        if not local_files:
+            print("⚠️  No .bin files found locally - skipping checksums")
+            return
+
+        print(f"🔐 Generating checksums for {len(local_files)} local files...")
 
         with open(checksums_path, "w") as f:
-            for file_info in validated_files:
-                filename = file_info["filename"]
-                file_path = self.output_dir / filename
-
-                if file_path.exists():
+            for file_path in sorted(local_files):
+                if file_path.is_file():
                     md5_hash = self.calculate_md5(file_path)
-                    f.write(f"{md5_hash}  {filename}\n")
-                    print(f"   {filename}: {md5_hash}")
+                    f.write(f"{md5_hash}  {file_path.name}\n")
+                    print(f"   {file_path.name}: {md5_hash}")
 
         print(f"✅ Checksums saved to {checksums_path}")
+
+    def generate_jekyll_redirects(self) -> None:
+        config, validated_files = self.validate_config_silent()
+
+        self.redirects_dir.mkdir(exist_ok=True, parents=True)
+
+        repo = os.environ.get("GITHUB_REPOSITORY", "henrique-coder/turbospeed-files")
+
+        print("🔗 Generating Jekyll redirect pages...")
+
+        for file_info in validated_files:
+            size_str = file_info["size_str"]
+            filename = file_info["filename"]
+
+            redirect_url = f"https://github.com/{repo}/releases/download/turbospeed-files/{filename}"
+
+            redirect_content = f"""---
+layout: redirect
+redirect_to: {redirect_url}
+permalink: /{size_str}/
+---
+"""
+
+            redirect_file = self.redirects_dir / f"{size_str}.md"
+            with open(redirect_file, "w") as f:
+                f.write(redirect_content)
+
+            print(f"   Created redirect: /{size_str}/ -> {filename}")
+
+        print("✅ Jekyll redirects generated successfully!")
 
     def generate_release_table(self) -> str:
         try:
             config, validated_files = self.validate_config_silent()
-
-            if not self.output_dir.exists():
-                return "No files generated yet."
+            # release_assets = self.get_release_asset_info()
 
             table_header = "| File | Size | Hash (MD5) | Download |\n|------|------|------------|----------|\n"
             table_rows = []
 
             repo_full = os.environ.get("GITHUB_REPOSITORY", "user/repo")
             repo_owner = repo_full.split("/")[0]
-            release_tag = os.environ.get("RELEASE_TAG", "turbospeed-files")
 
             for file_info in validated_files:
                 filename = file_info["filename"]
+                size_human = format_size(file_info["bytes"])
+                size_only = file_info["size_str"]
+                download_url = f"https://{repo_owner}.github.io/turbospeed-files/{size_only}"
+
                 file_path = self.output_dir / filename
+                md5_hash = self.calculate_md5(file_path) if file_path.exists() else "updating..."
 
-                if file_path.exists():
-                    size_human = format_size(file_info["bytes"])
-                    md5_hash = self.calculate_md5(file_path)
-                    size_only = file_info["size_str"]
-                    download_url = f"https://{repo_owner}.github.io/turbospeed-files/{size_only}"
-
-                    row = f"| `{filename}` | **{size_human}** | `{md5_hash}` | [📥 Download]({download_url}) |"
-                    table_rows.append(row)
+                row = f"| `{filename}` | **{size_human}** | `{md5_hash}` | [📥 Download]({download_url}) |"
+                table_rows.append(row)
 
             if not table_rows:
-                return "No files available for download."
+                return "No files configured."
 
             total_size = sum(f["bytes"] for f in validated_files)
+            release_tag = os.environ.get("RELEASE_TAG", "turbospeed-files")
             footer = f"\n\n**Total Collection Size:** {format_size(total_size)} • **Files:** {len(table_rows)}\n\n**Checksums:** [📋 checksums.txt](https://github.com/{repo_full}/releases/download/{release_tag}/checksums.txt)"
 
             return table_header + "\n".join(table_rows) + footer
@@ -384,6 +438,7 @@ def main() -> None:
     parser.add_argument("--generate-checksums", action="store_true", help="Generate checksums file")
     parser.add_argument("--clean-release", action="store_true", help="Clean outdated release assets")
     parser.add_argument("--sync-release", action="store_true", help="Sync release assets (clean + check missing)")
+    parser.add_argument("--generate-jekyll-redirects", action="store_true", help="Generate Jekyll redirect pages")
 
     args = parser.parse_args()
     generator = TurboSpeedGenerator()
@@ -403,6 +458,8 @@ def main() -> None:
             generator.clean_release_assets()
         elif args.sync_release:
             generator.sync_release_assets()
+        elif args.generate_jekyll_redirects:
+            generator.generate_jekyll_redirects()
         else:
             parser.print_help()
 

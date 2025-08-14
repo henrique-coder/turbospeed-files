@@ -1,8 +1,18 @@
 source: docs
 plugins:
-  - jekyll-relative-links
+  - jekyll-redirect-from
 relative_links:
   enabled: true
   collections: false
 include:
   - README.md
+
+collections:
+  redirects:
+    output: true
+
+defaults:
+  - scope:
+      path: "_redirects"
+    values:
+      layout: "redirect"
