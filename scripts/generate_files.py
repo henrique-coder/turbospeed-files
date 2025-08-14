@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import argparse
 import hashlib
 import os
@@ -124,7 +122,7 @@ class TurboSpeedGenerator:
 
         return config
 
-    def validate_config(self) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    def validate_config_silent(self) -> tuple[dict[str, Any], list[dict[str, Any]]]:
         config = self.load_config()
 
         if len(config["files"]) > self.max_files_per_release:
@@ -132,12 +130,10 @@ class TurboSpeedGenerator:
 
         self.check_for_duplicates(config["files"])
 
-        total_size_bytes = 0
         validated_files = []
 
         for size_str in config["files"]:
             size_bytes, normalized_size = self.parse_and_validate_size(size_str)
-            total_size_bytes += size_bytes
 
             validated_files.append({
                 "size_str": normalized_size,
@@ -146,6 +142,13 @@ class TurboSpeedGenerator:
             })
 
         validated_files.sort(key=lambda x: x["bytes"])
+
+        return config, validated_files
+
+    def validate_config(self) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+        config, validated_files = self.validate_config_silent()
+
+        total_size_bytes = sum(f["bytes"] for f in validated_files)
 
         print("✅ Configuration valid:")
         print(f"   - Files: {len(validated_files)}")
@@ -201,7 +204,7 @@ class TurboSpeedGenerator:
 
     def clean_release_assets(self) -> None:
         try:
-            config, validated_files = self.validate_config()
+            config, validated_files = self.validate_config_silent()
             valid_filenames = {f["filename"] for f in validated_files}
             valid_filenames.add("checksums.txt")
 
@@ -248,7 +251,7 @@ class TurboSpeedGenerator:
         print(f"✅ Generated {len(validated_files)} files successfully!")
 
     def generate_checksums(self) -> None:
-        config, validated_files = self.validate_config()
+        config, validated_files = self.validate_config_silent()
 
         if not self.output_dir.exists():
             raise FileNotFoundError("Generated files directory not found")
@@ -271,7 +274,7 @@ class TurboSpeedGenerator:
 
     def generate_release_table(self) -> str:
         try:
-            config, validated_files = self.validate_config()
+            config, validated_files = self.validate_config_silent()
 
             if not self.output_dir.exists():
                 return "No files generated yet."
@@ -307,7 +310,7 @@ class TurboSpeedGenerator:
 
     def calculate_total_size(self) -> str:
         try:
-            config, validated_files = self.validate_config()
+            config, validated_files = self.validate_config_silent()
             total_bytes = sum(f["bytes"] for f in validated_files)
             return format_size(total_bytes)
         except Exception:
