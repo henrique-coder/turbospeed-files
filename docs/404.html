@@ -3,121 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TurboSpeed Files - Redirect</title>
+    <title>TurboSpeed Files - File Not Found</title>
     <link rel="stylesheet" href="css/style.css" />
-    <style>
-      .redirect-container {
-        text-align: center;
-        padding: 2rem;
-        max-width: 600px;
-        margin: 2rem auto;
-      }
-      .spinner {
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #007acc;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin: 20px auto;
-      }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-      .error-message {
-        color: #dc3545;
-        background: #f8d7da;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 1rem 0;
-      }
-    </style>
   </head>
   <body>
-    <div class="redirect-container">
-      <h1>🚀 TurboSpeed Files</h1>
-      <div id="redirect-status">
-        <div class="spinner"></div>
-        <p>Checking file availability...</p>
+    <div class="container">
+      <div class="error-container">
+        <h1>🚀 TurboSpeed Files</h1>
+
+        <div class="error-message">
+          <h2>❌ File Not Found</h2>
+          <p>The requested file size is not available or does not exist.</p>
+        </div>
+
+        <div class="help-section">
+          <h3>How to Find Available Files</h3>
+          <p>Check the current available file sizes at:</p>
+
+          <div class="links">
+            <a
+              href="https://github.com/henrique-coder/turbospeed-files"
+              target="_blank"
+              class="github-link"
+            >
+              📂 GitHub Repository
+            </a>
+            <a
+              href="https://github.com/henrique-coder/turbospeed-files/releases"
+              target="_blank"
+              class="github-link"
+            >
+              📦 Latest Release
+            </a>
+          </div>
+
+          <div class="format-info">
+            <h4>URL Format</h4>
+            <code
+              >https://henrique-coder.github.io/turbospeed-files/{SIZE}</code
+            >
+            <p>Examples: /1mb, /100kb, /2gb</p>
+          </div>
+        </div>
+
+        <div class="back-home">
+          <a href="/">← Back to Home</a>
+        </div>
       </div>
     </div>
-
-    <script>
-      (async function () {
-        const path = window.location.pathname;
-        const sizeParam = path.split("/").pop().toLowerCase();
-
-        if (!sizeParam || sizeParam === "404.html") {
-          document.getElementById("redirect-status").innerHTML = `
-                    <div class="error-message">
-                        <h3>Invalid URL</h3>
-                        <p>Please use the format: <code>/SIZE</code> (e.g., /1mb, /100kb, /2gb)</p>
-                        <a href="/">← Back to main page</a>
-                    </div>
-                `;
-          return;
-        }
-
-        try {
-          const response = await fetch("../file-sizes.yaml");
-          const yamlText = await response.text();
-
-          const files = [];
-          const lines = yamlText.split("\n");
-          let inFilesSection = false;
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (trimmed === "files:") {
-              inFilesSection = true;
-              continue;
-            }
-            if (inFilesSection && trimmed.startsWith("- ")) {
-              const size = trimmed
-                .replace(/^- ["']?|["']?$/g, "")
-                .toLowerCase();
-              files.push(size);
-            } else if (inFilesSection && !trimmed.startsWith("-") && trimmed) {
-              break;
-            }
-          }
-
-          if (files.includes(sizeParam)) {
-            const downloadUrl = `https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/turbospeed-file-${sizeParam}.bin`;
-
-            document.getElementById("redirect-status").innerHTML = `
-                        <p>✅ File found! Redirecting to download...</p>
-                        <p><strong>turbospeed-file-${sizeParam}.bin</strong></p>
-                    `;
-
-            setTimeout(() => {
-              window.location.href = downloadUrl;
-            }, 1000);
-          } else {
-            document.getElementById("redirect-status").innerHTML = `
-                        <div class="error-message">
-                            <h3>File Not Found</h3>
-                            <p>Size <strong>${sizeParam}</strong> is not available.</p>
-                            <p>Available sizes: ${files.join(", ")}</p>
-                            <a href="/">← Back to main page</a>
-                        </div>
-                    `;
-          }
-        } catch (error) {
-          document.getElementById("redirect-status").innerHTML = `
-                    <div class="error-message">
-                        <h3>Error</h3>
-                        <p>Could not validate file availability. Please try again.</p>
-                        <a href="/">← Back to main page</a>
-                    </div>
-                `;
-        }
-      })();
-    </script>
   </body>
 </html>

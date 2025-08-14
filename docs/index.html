@@ -24,42 +24,48 @@
       <main>
         <div class="usage-section">
           <h2>Quick Download</h2>
-          <p>Use these short URLs to download files instantly:</p>
+          <p>Use short URLs to download files instantly:</p>
 
-          <div class="url-examples">
-            <div class="url-example">
+          <div class="url-format">
+            <div class="format-example">
               <code
-                >https://henrique-coder.github.io/turbospeed-files/100kb</code
+                >https://henrique-coder.github.io/turbospeed-files/{SIZE}</code
               >
-              <span class="arrow">→</span>
-              <span class="file-info">turbospeed-file-100kb.bin</span>
             </div>
-            <div class="url-example">
-              <code>https://henrique-coder.github.io/turbospeed-files/1mb</code>
-              <span class="arrow">→</span>
-              <span class="file-info">turbospeed-file-1mb.bin</span>
-            </div>
-            <div class="url-example">
-              <code>https://henrique-coder.github.io/turbospeed-files/1gb</code>
-              <span class="arrow">→</span>
-              <span class="file-info">turbospeed-file-1gb.bin</span>
-            </div>
+            <p class="format-description">
+              Replace <strong>{SIZE}</strong> with the desired file size (e.g.,
+              1mb, 100kb, 2gb)
+            </p>
           </div>
         </div>
 
-        <div class="files-section">
-          <h2>Available Files</h2>
-          <div id="loading">Loading available files...</div>
-          <div id="files-list" class="files-grid"></div>
-        </div>
-
         <div class="info-section">
+          <h2>Available Files</h2>
+          <p>
+            For current available file sizes, check the
+            <a
+              href="https://github.com/henrique-coder/turbospeed-files"
+              target="_blank"
+            >
+              GitHub repository
+            </a>
+            or view the latest
+            <a
+              href="https://github.com/henrique-coder/turbospeed-files/releases"
+              target="_blank"
+            >
+              release </a
+            >.
+          </p>
+
           <h3>How it Works</h3>
           <ul>
-            <li>URLs are validated against current available files</li>
-            <li>Invalid sizes return a 404 error</li>
             <li>All files are empty (zero-filled) for testing purposes</li>
             <li>Perfect for bandwidth and storage testing</li>
+            <li>
+              Files are validated against current repository configuration
+            </li>
+            <li>Invalid sizes return a 404 error</li>
           </ul>
         </div>
       </main>
@@ -75,7 +81,5 @@
         </p>
       </footer>
     </div>
-
-    <script src="js/redirect.js"></script>
   </body>
 </html>

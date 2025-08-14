@@ -23,7 +23,7 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   background: white;
@@ -52,116 +52,42 @@ header p {
 }
 
 .usage-section,
-.files-section,
 .info-section {
   margin: 2rem 0;
 }
 
 .usage-section h2,
-.files-section h2,
+.info-section h2,
 .info-section h3 {
   color: var(--primary-color);
   margin-bottom: 1rem;
 }
 
-.url-examples {
-  display: grid;
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-
-.url-example {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+.url-format {
   background: var(--secondary-color);
+  padding: 1.5rem;
   border-radius: 8px;
   border-left: 4px solid var(--primary-color);
-}
-
-.url-example code {
-  background: white;
-  padding: 0.5rem;
-  border-radius: 4px;
-  font-family: "Monaco", "Consolas", monospace;
-  font-size: 0.9rem;
-  flex: 1;
-}
-
-.arrow {
-  color: var(--primary-color);
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.file-info {
-  color: #666;
-  font-weight: 500;
-}
-
-.files-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
   margin: 1.5rem 0;
 }
 
-.file-card {
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1rem;
+.format-example {
+  margin-bottom: 1rem;
+}
+
+.format-example code {
   background: white;
-  transition: all 0.2s ease;
-}
-
-.file-card:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.1);
-}
-
-.file-size {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--primary-color);
-  margin-bottom: 0.5rem;
-}
-
-.file-url {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.file-url input {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
+  padding: 1rem;
   border-radius: 4px;
   font-family: "Monaco", "Consolas", monospace;
-  font-size: 0.85rem;
-  background: #f8f9fa;
+  font-size: 1rem;
+  display: block;
+  word-break: break-all;
 }
 
-.file-url button,
-.file-url .download-btn {
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.file-url button:hover,
-.file-url .download-btn:hover {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
+.format-description {
+  color: #666;
+  font-size: 0.95rem;
 }
 
 .info-section ul {
@@ -183,12 +109,113 @@ header p {
   font-weight: bold;
 }
 
+.info-section a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.info-section a:hover {
+  text-decoration: underline;
+}
+
+.error-container {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.error-container h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 2rem;
+}
+
 .error-message {
   background: #f8d7da;
   color: var(--danger-color);
-  padding: 1rem;
+  padding: 2rem;
   border-radius: 8px;
   border-left: 4px solid var(--danger-color);
+  margin: 2rem 0;
+}
+
+.error-message h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.help-section {
+  text-align: left;
+  margin: 2rem 0;
+}
+
+.help-section h3,
+.help-section h4 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.links {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.github-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.github-link:hover {
+  background: #005a9e;
+  transform: translateY(-2px);
+}
+
+.format-info {
+  background: var(--secondary-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.format-info code {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-family: "Monaco", "Consolas", monospace;
+  font-size: 0.9rem;
+  display: block;
+  margin: 1rem 0;
+  word-break: break-all;
+}
+
+.format-info p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.back-home {
+  margin-top: 2rem;
+}
+
+.back-home a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.back-home a:hover {
+  text-decoration: underline;
 }
 
 footer {
@@ -208,28 +235,18 @@ footer a:hover {
   text-decoration: underline;
 }
 
-#loading {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-}
-
 @media (max-width: 768px) {
   .container {
     margin: 1rem;
     padding: 1rem;
   }
 
-  .url-example {
+  .links {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 
-  .arrow {
-    transform: rotate(90deg);
-  }
-
-  .files-grid {
-    grid-template-columns: 1fr;
+  .format-example code {
+    font-size: 0.8rem;
   }
 }
