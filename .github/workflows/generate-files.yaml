@@ -3,7 +3,7 @@ name: Generate TurboSpeed Files
 on:
   push:
     paths:
-      - 'file-sizes.yml'
+      - 'file-sizes.yaml'
   workflow_dispatch:
 
 permissions:
