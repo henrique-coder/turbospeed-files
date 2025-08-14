@@ -1,0 +1,8 @@
+source: docs
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: false
+include:
+  - README.md
