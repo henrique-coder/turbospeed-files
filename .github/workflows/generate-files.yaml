@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyyaml requests humanfriendly
+          pip install --upgrade humanfriendly pyyaml
 
       - name: Validate configuration
         run: python scripts/generate_files.py --validate
