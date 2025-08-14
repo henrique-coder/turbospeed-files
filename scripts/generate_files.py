@@ -218,6 +218,52 @@ class TurboSpeedGenerator:
         except Exception as e:
             print(f"Warning: Could not clean release assets: {e}")
 
+    def check_missing_files(self) -> list[dict[str, Any]]:
+        try:
+            config, validated_files = self.validate_config_silent()
+            current_assets = self.get_release_assets()
+
+            missing_files = []
+
+            for file_info in validated_files:
+                filename = file_info["filename"]
+                if filename not in current_assets:
+                    missing_files.append(file_info)
+                    print(f"🔍 Missing file detected: {filename}")
+
+            if not missing_files:
+                print("✅ All required files exist in release")
+            else:
+                print(f"⚠️  Found {len(missing_files)} missing files")
+
+            return missing_files
+
+        except Exception as e:
+            print(f"Warning: Could not check missing files: {e}")
+            return []
+
+    def sync_release_assets(self) -> None:
+        print("🔄 Syncing release assets...")
+
+        self.clean_release_assets()
+
+        missing_files = self.check_missing_files()
+
+        if missing_files:
+            print(f"🚀 Recreating {len(missing_files)} missing files...")
+
+            self.output_dir.mkdir(exist_ok=True)
+
+            for file_info in missing_files:
+                filename = file_info["filename"]
+                size_bytes = file_info["bytes"]
+                file_path = self.output_dir / filename
+
+                print(f"   Recreating {filename} ({format_size(size_bytes)})...")
+                self.create_file_optimized(file_path, size_bytes)
+
+        print("✅ Release sync completed")
+
     def create_file_optimized(self, file_path: Path, size_bytes: int) -> None:
         chunk_size = min(1024 * 1024, size_bytes)
 
@@ -230,25 +276,35 @@ class TurboSpeedGenerator:
                 remaining -= write_size
 
     def generate_files(self) -> None:
-        config, validated_files = self.validate_config()
+        config, validated_files = self.validate_config_silent()
 
         self.output_dir.mkdir(exist_ok=True)
 
-        print(f"🚀 Generating {len(validated_files)} files...")
+        files_to_generate = []
 
         for file_info in validated_files:
             filename = file_info["filename"]
             size_bytes = file_info["bytes"]
             file_path = self.output_dir / filename
 
-            if file_path.exists() and file_path.stat().st_size == size_bytes:
-                print(f"   Skipping {filename} (already exists with correct size)")
-                continue
+            if not file_path.exists() or file_path.stat().st_size != size_bytes:
+                files_to_generate.append(file_info)
+
+        if not files_to_generate:
+            print("✅ All files already exist with correct sizes")
+            return
+
+        print(f"🚀 Generating {len(files_to_generate)} files...")
+
+        for file_info in files_to_generate:
+            filename = file_info["filename"]
+            size_bytes = file_info["bytes"]
+            file_path = self.output_dir / filename
 
             print(f"   Creating {filename} ({format_size(size_bytes)})...")
             self.create_file_optimized(file_path, size_bytes)
 
-        print(f"✅ Generated {len(validated_files)} files successfully!")
+        print(f"✅ Generated {len(files_to_generate)} files successfully!")
 
     def generate_checksums(self) -> None:
         config, validated_files = self.validate_config_silent()
@@ -282,7 +338,8 @@ class TurboSpeedGenerator:
             table_header = "| File | Size | Hash (MD5) | Download |\n|------|------|------------|----------|\n"
             table_rows = []
 
-            repo_name = os.environ.get("GITHUB_REPOSITORY", "user/repo")
+            repo_full = os.environ.get("GITHUB_REPOSITORY", "user/repo")
+            repo_owner = repo_full.split("/")[0]
             release_tag = os.environ.get("RELEASE_TAG", "turbospeed-files")
 
             for file_info in validated_files:
@@ -292,7 +349,8 @@ class TurboSpeedGenerator:
                 if file_path.exists():
                     size_human = format_size(file_info["bytes"])
                     md5_hash = self.calculate_md5(file_path)
-                    download_url = f"https://henrique-coder.github.io/turbospeed-files/{filename.split('.')[0]}"
+                    size_only = file_info["size_str"]
+                    download_url = f"https://{repo_owner}.github.io/turbospeed-files/{size_only}"
 
                     row = f"| `{filename}` | **{size_human}** | `{md5_hash}` | [📥 Download]({download_url}) |"
                     table_rows.append(row)
@@ -301,7 +359,7 @@ class TurboSpeedGenerator:
                 return "No files available for download."
 
             total_size = sum(f["bytes"] for f in validated_files)
-            footer = f"\n\n**Total Collection Size:** {format_size(total_size)} • **Files:** {len(table_rows)}\n\n**Checksums:** [📋 checksums.txt](https://github.com/{repo_name}/releases/download/{release_tag}/checksums.txt)"
+            footer = f"\n\n**Total Collection Size:** {format_size(total_size)} • **Files:** {len(table_rows)}\n\n**Checksums:** [📋 checksums.txt](https://github.com/{repo_full}/releases/download/{release_tag}/checksums.txt)"
 
             return table_header + "\n".join(table_rows) + footer
 
@@ -320,11 +378,12 @@ class TurboSpeedGenerator:
 def main() -> None:
     parser = argparse.ArgumentParser(description="TurboSpeed Files Generator")
     parser.add_argument("--validate", action="store_true", help="Validate configuration only")
-    parser.add_argument("--generate", action="store_true", help="Generate files")
+    parser.add_argument("--generate", action="store_true", help="Generate missing files only")
     parser.add_argument("--calculate-total", action="store_true", help="Calculate total size")
     parser.add_argument("--generate-table", action="store_true", help="Generate release table")
     parser.add_argument("--generate-checksums", action="store_true", help="Generate checksums file")
     parser.add_argument("--clean-release", action="store_true", help="Clean outdated release assets")
+    parser.add_argument("--sync-release", action="store_true", help="Sync release assets (clean + check missing)")
 
     args = parser.parse_args()
     generator = TurboSpeedGenerator()
@@ -342,6 +401,8 @@ def main() -> None:
             generator.generate_checksums()
         elif args.clean_release:
             generator.clean_release_assets()
+        elif args.sync_release:
+            generator.sync_release_assets()
         else:
             parser.print_help()
 

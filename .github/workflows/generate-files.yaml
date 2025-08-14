@@ -2,8 +2,7 @@ name: Generate TurboSpeed Files
 
 on:
   push:
-    paths:
-      - "file-sizes.yaml"
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -22,49 +21,31 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Check if config changed
-        id: config-changed
-        run: |
-          if git diff HEAD~1 HEAD --name-only | grep -q "file-sizes.yaml"; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Set up Python
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
 
       - name: Install dependencies
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           pip install --upgrade humanfriendly requests pyyaml
 
       - name: Validate configuration
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: python scripts/generate_files.py --validate
 
-      - name: Clean release assets
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
-        run: python scripts/generate_files.py --clean-release
+      - name: Check missing files and clean outdated
+        run: python scripts/generate_files.py --sync-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate files
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+      - name: Generate missing files
         run: python scripts/generate_files.py --generate
 
       - name: Generate checksums
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: python scripts/generate_files.py --generate-checksums
 
       - name: Generate release table
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         id: generate-table
         run: |
           TABLE=$(python scripts/generate_files.py --generate-table)
@@ -73,7 +54,6 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create or update release
-        if: steps.config-changed.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
