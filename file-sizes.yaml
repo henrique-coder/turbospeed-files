@@ -1,9 +1,12 @@
+# TurboSpeed Files - Configuration
+
 # Supported formats: {number}kb, {number}mb, {number}gb (float supported)
 # Minimum: 1KB - Maximum: 2GB (GitHub Free limit) - Maximum files per release: 1000
 
 project_name: "turbospeed"
 files:
   - "1kb"
+  - "25kb"
   - "50kb"
   - "100kb"
   - "250kb"
