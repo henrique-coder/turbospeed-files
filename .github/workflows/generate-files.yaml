@@ -1,0 +1,74 @@
+name: Generate TurboSpeed Files
+
+on:
+  push:
+    paths:
+      - 'file-sizes.yml'
+  workflow_dispatch:
+
+env:
+  RELEASE_TAG: 'turbospeed-files'
+  RELEASE_NAME: 'TurboSpeed Files Collection'
+
+jobs:
+  generate-files:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: |
+        pip install PyYAML requests
+
+    - name: Validate configuration
+      run: python scripts/generate_files.py --validate
+
+    - name: Generate files
+      run: python scripts/generate_files.py --generate
+
+    - name: Get existing release assets
+      id: get-assets
+      run: |
+        ASSETS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.RELEASE_TAG }}" \
+          | jq -r '.assets[].name' 2>/dev/null || echo "")
+        echo "existing_assets<<EOF" >> $GITHUB_OUTPUT
+        echo "$ASSETS" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Create or update release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.RELEASE_TAG }}
+        name: ${{ env.RELEASE_NAME }}
+        body: |
+          ## TurboSpeed Files Collection
+
+          This release contains pre-generated files of various sizes for testing purposes.
+
+          **Generated files:** ${{ steps.count-files.outputs.file_count }}
+          **Total size:** ${{ steps.count-files.outputs.total_size }}
+
+          Files are named with format: `{project_name}-{size}.bin`
+
+          > ⚠️ **Note:** Files are empty (zero-filled) and created for size testing only.
+        files: ./generated/*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Count generated files
+      id: count-files
+      run: |
+        FILE_COUNT=$(ls -1 ./generated/*.bin 2>/dev/null | wc -l || echo "0")
+        TOTAL_SIZE=$(python scripts/generate_files.py --calculate-total)
+        echo "file_count=$FILE_COUNT" >> $GITHUB_OUTPUT
+        echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
