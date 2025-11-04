@@ -13,7 +13,6 @@ app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 CONFIG_FILE = "file_sizes.json"
 OUTPUT_DIR = Path("./generated")
-REDIRECTS_DIR = Path("./docs/_redirects")
 RELEASE_TAG = "turbospeed-files"
 
 
@@ -179,43 +178,6 @@ def checksums():
 
 
 @app.command()
-def redirects():
-    sizes = load_config()
-    REDIRECTS_DIR.mkdir(exist_ok=True, parents=True)
-
-    repo = get_repo()
-
-    current_redirects = set()
-
-    for size_str in sizes:
-        normalized = normalize_filename(size_str)
-        filename = f"{normalized}.bin"
-
-        redirect_url = f"https://github.com/{repo}/releases/download/{RELEASE_TAG}/{filename}"
-
-        content = f"""---
-layout: redirect
-redirect_to: {redirect_url}
-permalink: /{normalized}/
----
-"""
-
-        redirect_file = REDIRECTS_DIR / f"{normalized}.md"
-        with open(redirect_file, "w") as f:
-            f.write(content)
-
-        current_redirects.add(redirect_file.name)
-        typer.echo(f"  /{normalized}/ -> {filename}")
-
-    for old_redirect in REDIRECTS_DIR.glob("*.md"):
-        if old_redirect.name not in current_redirects:
-            old_redirect.unlink()
-            typer.echo(f"  Removed old redirect: {old_redirect.name}")
-
-    typer.echo("✅ Redirects created")
-
-
-@app.command()
 def table():
     sizes = load_config()
     repo = get_repo()
@@ -279,9 +241,6 @@ def run():
 
     typer.echo("\n=== Creating checksums ===")
     checksums()
-
-    typer.echo("\n=== Generating redirects ===")
-    redirects()
 
     typer.echo("\n=== Cleaning up release ===")
     cleanup()
