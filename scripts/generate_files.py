@@ -180,6 +180,8 @@ def redirects():
 
     repo = get_repo()
 
+    current_redirects = set()
+
     for size_str in sizes:
         normalized = normalize_filename(size_str)
         filename = f"{normalized}.bin"
@@ -197,7 +199,13 @@ permalink: /{normalized}/
         with open(redirect_file, "w") as f:
             f.write(content)
 
+        current_redirects.add(redirect_file.name)
         typer.echo(f"  /{normalized}/ -> {filename}")
+
+    for old_redirect in REDIRECTS_DIR.glob("*.md"):
+        if old_redirect.name not in current_redirects:
+            old_redirect.unlink()
+            typer.echo(f"  Removed old redirect: {old_redirect.name}")
 
     typer.echo("✅ Redirects created")
 
