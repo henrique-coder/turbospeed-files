@@ -41,7 +41,7 @@ def parse_size(size_str: str) -> int:
 
 
 def format_size(size_bytes: int) -> str:
-    return humanize.naturalsize(size_bytes, binary=True)
+    return humanize.naturalsize(size_bytes, binary=False)
 
 
 def normalize_filename(size_str: str) -> str:
@@ -111,11 +111,16 @@ def validate():
         typer.echo(f"Error: too many files ({len(sizes)} > 1000)", err=True)
         raise typer.Exit(1)
 
+    max_size = 2_000_000_000
     seen = set()
     files_info = []
 
     for size_str in sizes:
         size_bytes = parse_size(size_str)
+
+        if size_bytes > max_size:
+            typer.echo(f"Error: file {size_str} exceeds GitHub limit (2 GB max)", err=True)
+            raise typer.Exit(1)
 
         if size_bytes in seen:
             typer.echo(f"Error: duplicate size detected: {size_str}", err=True)
