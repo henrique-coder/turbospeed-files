@@ -87,7 +87,7 @@ jobs:
 
             **Download:**
             ```bash
-            curl -L -O https://henrique-coder.github.io/turbospeed-files/1gib
+            curl -L -O https://henrique-coder.github.io/turbospeed-files/1gb
             ```
           files: ./generated/*
           draft: false
