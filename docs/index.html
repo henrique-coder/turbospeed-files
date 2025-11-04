@@ -3,141 +3,389 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TurboSpeed Files - Fast Download Links</title>
+    <title>TurboSpeed Files - Test Files for Download Speed Testing</title>
     <meta
       name="description"
-      content="Fast download links for TurboSpeed test files"
+      content="Fast, reliable test files for bandwidth testing, download speed testing, and API development. Sizes from 1KB to 2GB."
     />
-    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>"
     />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6",
+              secondary: "#8b5cf6",
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>🚀 TurboSpeed Files</h1>
-        <p>Ultra-fast download links for test files</p>
+  <body
+    class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen"
+  >
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <div class="inline-block bg-white rounded-2xl shadow-xl p-8 mb-6">
+          <h1
+            class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4"
+          >
+            🚀 TurboSpeed Files
+          </h1>
+          <p class="text-xl text-gray-600">
+            Empty binary test files for bandwidth testing and development
+          </p>
+        </div>
       </header>
 
-      <main>
-        <div class="usage-section">
-          <h2>Quick Download</h2>
-          <p>
-            Use short URLs that work with <strong>any download tool</strong>:
-          </p>
+      <!-- Quick Start -->
+      <section class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">⚡ Quick Download</h2>
+        <p class="text-gray-600 mb-6">
+          Direct download URLs from GitHub Releases - works with any tool:
+        </p>
 
-          <div class="url-format">
-            <div class="format-example">
-              <code
-                >https://henrique-coder.github.io/turbospeed-files/{SIZE}</code
-              >
+        <div
+          class="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-6 mb-6"
+        >
+          <code class="text-sm md:text-base font-mono text-gray-800 break-all">
+            https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/<span
+              class="font-bold text-blue-600"
+              >{SIZE}.bin</span
+            >
+          </code>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+          <a
+            href="https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/1mb.bin"
+            class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl p-6 text-center transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+          >
+            <div class="text-4xl mb-2">📦</div>
+            <div class="font-bold text-xl mb-1">1 MB</div>
+            <div class="text-sm opacity-90">Click to download</div>
+          </a>
+          <a
+            href="https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/100mb.bin"
+            class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl p-6 text-center transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+          >
+            <div class="text-4xl mb-2">📦</div>
+            <div class="font-bold text-xl mb-1">100 MB</div>
+            <div class="text-sm opacity-90">Click to download</div>
+          </a>
+          <a
+            href="https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/1gb.bin"
+            class="group bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl p-6 text-center transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+          >
+            <div class="text-4xl mb-2">📦</div>
+            <div class="font-bold text-xl mb-1">1 GB</div>
+            <div class="text-sm opacity-90">Click to download</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- CLI Examples -->
+      <section class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">
+          💻 Command Line Usage
+        </h2>
+
+        <div class="space-y-4">
+          <div class="border-l-4 border-blue-500 bg-gray-50 rounded-r-xl p-6">
+            <div class="flex items-center mb-3">
+              <span class="text-2xl mr-3">🌐</span>
+              <h3 class="font-bold text-xl text-gray-800">cURL</h3>
             </div>
-            <p class="format-description">
-              Replace <strong>{SIZE}</strong> with any file size - works with
-              curl, wget, browsers, and all download tools
-            </p>
+            <code
+              class="block bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto"
+            >
+              curl -L -O
+              https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/100mb.bin
+            </code>
           </div>
 
-          <div class="examples">
-            <h3>Example URLs</h3>
-            <div class="example-links">
-              <div class="example-item">
-                <a href="/turbospeed-files/100kb" target="_blank">
-                  <code>/100kb</code>
-                </a>
-                <span>→</span>
-                <span>100kb.bin</span>
-              </div>
-              <div class="example-item">
-                <a href="/turbospeed-files/1mb" target="_blank">
-                  <code>/1mb</code>
-                </a>
-                <span>→</span>
-                <span>1mb.bin</span>
-              </div>
-              <div class="example-item">
-                <a href="/turbospeed-files/2gb" target="_blank">
-                  <code>/2gb</code>
-                </a>
-                <span>→</span>
-                <span>2gb.bin</span>
-              </div>
+          <div class="border-l-4 border-purple-500 bg-gray-50 rounded-r-xl p-6">
+            <div class="flex items-center mb-3">
+              <span class="text-2xl mr-3">📥</span>
+              <h3 class="font-bold text-xl text-gray-800">wget</h3>
+            </div>
+            <code
+              class="block bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto"
+            >
+              wget
+              https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/100mb.bin
+            </code>
+          </div>
+
+          <div class="border-l-4 border-pink-500 bg-gray-50 rounded-r-xl p-6">
+            <div class="flex items-center mb-3">
+              <span class="text-2xl mr-3">⚡</span>
+              <h3 class="font-bold text-xl text-gray-800">PowerShell</h3>
+            </div>
+            <code
+              class="block bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto"
+            >
+              Invoke-WebRequest -Uri
+              "https://github.com/henrique-coder/turbospeed-files/releases/download/turbospeed-files/100mb.bin"
+              -OutFile "100mb.bin"
+            </code>
+          </div>
+        </div>
+      </section>
+
+      <!-- Available Sizes -->
+      <section class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">
+          📊 Available File Sizes
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center border-2 border-blue-200"
+          >
+            <div class="font-bold text-blue-700">1 KB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center border-2 border-blue-200"
+          >
+            <div class="font-bold text-blue-700">25 KB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center border-2 border-blue-200"
+          >
+            <div class="font-bold text-blue-700">50 KB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center border-2 border-blue-200"
+          >
+            <div class="font-bold text-blue-700">100 KB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center border-2 border-blue-200"
+          >
+            <div class="font-bold text-blue-700">250 KB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center border-2 border-blue-200"
+          >
+            <div class="font-bold text-blue-700">500 KB</div>
+          </div>
+
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">1 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">5 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">10 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">25 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">50 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">75 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">100 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">150 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">200 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">250 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">300 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">350 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">400 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">450 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">500 MB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center border-2 border-purple-200"
+          >
+            <div class="font-bold text-purple-700">750 MB</div>
+          </div>
+
+          <div
+            class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-3 text-center border-2 border-pink-200"
+          >
+            <div class="font-bold text-pink-700">1 GB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-3 text-center border-2 border-pink-200"
+          >
+            <div class="font-bold text-pink-700">1.25 GB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-3 text-center border-2 border-pink-200"
+          >
+            <div class="font-bold text-pink-700">1.5 GB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-3 text-center border-2 border-pink-200"
+          >
+            <div class="font-bold text-pink-700">1.75 GB</div>
+          </div>
+          <div
+            class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-3 text-center border-2 border-pink-200"
+          >
+            <div class="font-bold text-pink-700">2 GB</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">✨ Features</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">⚡</div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">Lightning Fast</h3>
+              <p class="text-gray-600">
+                Hosted on GitHub CDN for maximum speed worldwide
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">🔗</div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">Direct URLs</h3>
+              <p class="text-gray-600">
+                Simple, predictable URLs that work everywhere
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">🛠️</div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">Developer Friendly</h3>
+              <p class="text-gray-600">
+                Perfect for automation, CI/CD, and testing
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">🎯</div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">Zero-Filled</h3>
+              <p class="text-gray-600">
+                Empty binary files optimized for speed testing
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">🔒</div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">Reliable</h3>
+              <p class="text-gray-600">
+                Automatically updated via GitHub Actions
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">📦</div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">MD5 Checksums</h3>
+              <p class="text-gray-600">
+                Verify file integrity with included checksums
+              </p>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="info-section">
-          <h2>Perfect For</h2>
-          <div class="use-cases">
-            <div class="use-case">
-              <h3>🌐 CLI Tools</h3>
-              <p>Works perfectly with command line downloaders</p>
-              <code
-                >curl -L -O
-                https://henrique-coder.github.io/turbospeed-files/1mb</code
-              >
-            </div>
-            <div class="use-case">
-              <h3>📊 Bandwidth Testing</h3>
-              <p>Measure download speeds with known file sizes</p>
-              <code
-                >wget
-                https://henrique-coder.github.io/turbospeed-files/100mb</code
-              >
-            </div>
-            <div class="use-case">
-              <h3>🛠️ API Testing</h3>
-              <p>Test file handling in applications and scripts</p>
-              <code
-                >turbodl download
-                https://henrique-coder.github.io/turbospeed-files/10mb</code
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="features-section">
-          <h2>Features</h2>
-          <ul>
-            <li>⚡ Real HTTP redirects - works with ALL tools</li>
-            <li>🔗 Universal compatibility - curl, wget, browsers, APIs</li>
-            <li>📱 Perfect for automation, scripts, and testing</li>
-            <li>🗂️ All files are empty (zero-filled) for testing</li>
-            <li>🚀 Optimized for maximum speed and reliability</li>
-          </ul>
-
-          <div class="note">
-            <p>
-              <strong>Available sizes:</strong> Check the
-              <a
-                href="https://github.com/henrique-coder/turbospeed-files/releases"
-                target="_blank"
-              >
-                GitHub releases page
-              </a>
-              for current file list
-            </p>
-          </div>
-        </div>
-      </main>
-
-      <footer>
-        <div class="footer-links">
+      <!-- Footer -->
+      <footer class="text-center bg-white rounded-2xl shadow-xl p-8">
+        <div
+          class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 mb-6"
+        >
           <a
             href="https://github.com/henrique-coder/turbospeed-files"
             target="_blank"
+            class="inline-flex items-center space-x-2 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
           >
-            📂 GitHub Repository
+            <span>📂</span>
+            <span>View on GitHub</span>
           </a>
+
           <a
             href="https://github.com/henrique-coder/turbospeed-files/releases"
             target="_blank"
+            class="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
           >
-            📦 Latest Release
+            <span>📦</span>
+            <span>Latest Release</span>
           </a>
         </div>
+
+        <p class="text-gray-500 text-sm">
+          Made with ❤️ by
+          <a
+            href="https://github.com/henrique-coder"
+            class="text-blue-600 hover:underline"
+            >henrique-coder</a
+          >
+          • MIT License
+        </p>
       </footer>
     </div>
   </body>
