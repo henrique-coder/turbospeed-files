@@ -4,26 +4,32 @@ A high-performance file generation system that creates empty binary files of spe
 
 ## ✨ Features
 
-- **📏 Intelligent Size Parsing**: Accepts any format humanfriendly understands (kb, mb, gb, KB, MB, GB, etc.)
+- **📏 Intelligent Size Parsing**: Accepts standard size formats (kb, mb, gb)
 - **🧠 Smart Validation**: Prevents duplicates and enforces preferred size formats
 - **🤖 Automated Workflow**: Only runs when configuration changes, with intelligent cleanup
 - **🗑️ Auto Cleanup**: Removes outdated files from releases automatically
 - **📦 Smart Release Management**: Maintains clean, organized releases
 - **🔐 Integrity Checking**: Generates MD5 checksums for all files
 - **⚡ Optimized Generation**: Fast file creation with duplicate detection
+- **🌐 Direct Downloads**: URLs like `henrique-coder.github.io/turbospeed-files/1.5gb` automatically download files
 
 ## 📋 Size Limits & Formats
 
 - **Minimum size**: `1kb`
 - **Maximum size**: `2gb`
-- **Accepted formats**: Any format supported by humanfriendly library
+- **Accepted formats**: `kb`, `mb`, `gb` (e.g., `1.5gb`, `100mb`, `50kb`)
 - **Preferred formats**: Use `kb` for <1MB, `mb` for <1GB, `gb` for ≥1GB
 
 ## 🚀 Quick Start
 
 1. **Fork this repository**
-2. **Edit `file-sizes.yaml`**:
-
+2. **Edit `file_sizes.json`**:
+   ```json
+   {
+     "project_name": "turbospeed",
+     "files": ["1kb", "10mb", "100mb", "1gb"]
+   }
+   ```
 3. **Commit and push** - Actions only run when config changes!
 
 ## ⚠️ Format Rules
@@ -41,7 +47,7 @@ A high-performance file generation system that creates empty binary files of spe
 
 ## 🔧 File Naming
 
-Files are named as: `turbospeed-file-{size}.bin`
+Files are named as: `{size}.bin` (e.g., `1.5gb.bin`, `100mb.bin`, `1kb.bin`)
 
 ## 📄 License
 
