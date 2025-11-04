@@ -49,16 +49,6 @@ jobs:
       - name: Generate checksums
         run: uv run scripts/generate_files.py checksums
 
-      - name: Generate redirects
-        run: uv run scripts/generate_files.py redirects
-
-      - name: Commit redirects
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/_redirects/
-          git diff --staged --quiet || git commit -m "Update redirects" && git push || echo "No changes"
-
       - name: Generate table
         id: table
         run: |
