@@ -181,7 +181,6 @@ def checksums():
 def table():
     sizes = load_config()
     repo = get_repo()
-    repo_owner = repo.split("/")[0]
 
     lines = ["| File | Size | Hash (MD5) | Download |", "|------|------|------------|----------|"]
 
@@ -193,7 +192,7 @@ def table():
         normalized = normalize_filename(size_str)
         filename = f"{normalized}.bin"
         size_human = format_size(size_bytes)
-        download_url = f"https://{repo_owner}.github.io/turbospeed-files/{normalized}"
+        download_url = f"https://github.com/{repo}/releases/download/{RELEASE_TAG}/{filename}"
 
         file_path = OUTPUT_DIR / filename
         md5 = calculate_md5(file_path) if file_path.exists() else "pending"
