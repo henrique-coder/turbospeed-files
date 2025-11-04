@@ -1,0 +1,15 @@
+[project]
+name = "turbospeed-files"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "humanize>=4.14.0",
+    "orjson>=3.11.4",
+]
+
+[dependency-groups]
+lint = [
+    "ruff>=0.14.3",
+]
