@@ -3,94 +3,92 @@ name: Generate TurboSpeed Files
 on:
   push:
     branches: [main]
+    paths:
+      - "file_sizes.json"
+      - ".github/workflows/generate-files.yaml"
+      - "scripts/generate_files.py"
   workflow_dispatch:
 
 permissions:
   contents: write
-  actions: read
-  id-token: write
 
 env:
   RELEASE_TAG: "turbospeed-files"
-  RELEASE_NAME: "TurboSpeed Files Collection"
+  RELEASE_NAME: "TurboSpeed Files"
 
 jobs:
-  generate-files:
+  generate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.14"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
 
       - name: Install dependencies
+        run: uv sync --upgrade
+
+      - name: Validate config
+        run: uv run scripts/generate_files.py validate
+
+      - name: Generate files
+        run: uv run scripts/generate_files.py generate
+
+      - name: Generate checksums
+        run: uv run scripts/generate_files.py checksums
+
+      - name: Generate redirects
+        run: uv run scripts/generate_files.py redirects
+
+      - name: Commit redirects
         run: |
-          pip install --upgrade humanfriendly requests pyyaml
-
-      - name: Validate configuration
-        run: python scripts/generate_files.py --validate
-
-      - name: Check missing files and clean outdated
-        run: python scripts/generate_files.py --sync-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate ONLY missing files
-        run: python scripts/generate_files.py --generate
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate Jekyll redirect pages
-        run: python scripts/generate_files.py --generate-jekyll-redirects
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate checksums for new files
-        run: python scripts/generate_files.py --generate-checksums
-
-      - name: Generate release table
-        id: generate-table
-        run: |
-          TABLE=$(python scripts/generate_files.py --generate-table)
-          echo "release_table<<EOF" >> $GITHUB_OUTPUT
-          echo "$TABLE" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit Jekyll redirects to repository
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/_redirects/
-          git diff --staged --quiet || git commit -m "Update Jekyll redirects"
+          git diff --staged --quiet || git commit -m "Update redirects"
           git push
 
-      - name: Upload ONLY new files to release
+      - name: Clean release
+        run: uv run scripts/generate_files.py cleanup
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate table
+        id: table
+        run: |
+          TABLE=$(uv run scripts/generate_files.py table)
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$TABLE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_NAME }}
           body: |
-            ## 🚀 TurboSpeed Files Collection
+            ## 🚀 TurboSpeed Files
 
-            Pre-generated empty binary files of various sizes for testing, benchmarking, and development purposes.
+            Empty binary files for testing and benchmarking.
 
+            ### 📦 Files
 
-            ### 📦 Available Files
+            ${{ steps.table.outputs.content }}
 
-            ${{ steps.generate-table.outputs.release_table }}
+            ---
 
-            ### ⚠️ Important Notes
-
-            - All files are empty (zero-filled) and created for size testing only
-            - Files are optimized for fast download and minimal storage impact
-            - Perfect for bandwidth testing, storage testing, and development workflows
-            - Real HTTP redirects work with curl, wget, browsers, and all download tools
+            **Usage:**
+            ```bash
+            curl -L -O https://henrique-coder.github.io/turbospeed-files/1gb
+            wget https://henrique-coder.github.io/turbospeed-files/100mb
+            ```
           files: ./generated/*
           draft: false
           prerelease: false
