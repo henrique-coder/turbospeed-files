@@ -4,22 +4,30 @@ VENV := .venv
 FIRST_TARGET := $(firstword $(MAKECMDGOALS))
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 
-.PHONY: lint format help %
+.PHONY: lint format install tests help %
 .DEFAULT_GOAL := help
 
 lint:
-	npx prettier --check "**/*.{html,css,js,md,json,yaml}"
-	ruff check .
+	uv run npx prettier --check "**/*.{html,css,js,md,json,yaml}"
+	uv run ruff check .
 
 format:
-	npx prettier --write "**/*.{html,css,js,md,json,yaml}"
-	ruff format .
-	ruff check --fix .
+	uv run npx prettier --write "**/*.{html,css,js,md,json,yaml}"
+	uv run ruff format .
+	uv run ruff check --fix .
+
+install:
+	uv sync --upgrade --all-extras --all-groups
+
+tests:
+	uv run pytest -v --xfail-tb
 
 help:
 	@echo "Available commands:"
 	@echo "  lint       - Check code with 'prettier' and 'ruff'"
 	@echo "  format     - Format code with 'prettier' and 'ruff'"
+	@echo "  install    - Install dependencies with 'uv'"
+	@echo "  tests      - Run tests with 'pytest'"
 	@echo "  help       - Show this help message"
 
 %:
